@@ -1,227 +1,157 @@
-# 🎙️ Unified Audio Platform
+# 🎙️ Voice Draft, Room & Spin Wheel System
 
+> **A unified platform for vocal artists to record, mix, and collaborate on voice drafts in private social rooms, featuring a multiplayer spin‑wheel arena!**
 
+## 📖 Overview
+This repository contains the complete implementation for the Voice Draft, Room & Spin Wheel System. It encompasses an Android audio studio utilizing Oboe, a real-time Node.js backend for room state and draft sharing, and a multiplayer spin wheel system.
 
-> **A real‑time, unified audio platform for vocal artists to record, mix, and collaborate on voice drafts in private social rooms, featuring a multiplayer spin‑wheel arena!**
-
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Socket.IO](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)](https://socket.io/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-
----
-
-## 📖 About The Project
-
-The platform was born from the frustration of juggling separate tools for **recording**, **editing**, **sharing**, and **collaborating** on vocal takes. Instead of exporting a WAV file, uploading it to a cloud drive, and then waiting for a teammate to download it, developers wanted a **single, web‑based environment** where:
-
-*   Artists could **record** directly from the browser using the Web Audio API.
-*   Producers could **apply DSP effects** in real time.
-*   Teams could **share drafts instantly** inside a live, **private** audio room.
-*   Collaboration could be **fun** – hence the multiplayer spin‑wheel game that keeps the vibe lively.
-
-The platform delivers all of that and more, fully in the browser, with a sleek dark‑mode UI.
-
----
-
-## ✨ Feature Overview
-
-| Category | Feature | Details |
-|---|---|---|
-| **Audio Studio** | Web‑Audio‑API recording | `navigator.mediaDevices.getUserMedia` + `AudioContext` |
-| | Real‑time DSP effects | Reverb, Auto‑Tune (sim), Megaphone, Cyberpunk, Echo |
-| | Waveform visualizer | Canvas‑based analyser visualizer |
-| | Draft library | Save, rename, delete, play back locally |
-| **Social Rooms** | Private rooms with 6‑char code | Enforced on both client and server |
-| | Live participant list | Socket.io `room_members_updated` events |
-| | Synchronized draft broadcasting | `draft_shared` event triggers simultaneous playback |
-| **Spin Wheel Arena** | Multiplayer elimination game | Server‑authoritative `spinEngine.js` runs the loop |
-| | Configurable player count (3‑20) | Minimum required to start |
-| | Virtual reward system | Winner gets 500 points stored in MongoDB |
-| **UX & Design** | Premium dark theme | CSS Variables, glassmorphism, micro‑animations |
-| | Responsive layout | Works on desktop and tablets |
-
----
-
-## 🏗️ Architecture & Tech Stack
-
-### Frontend
-* **Framework:** React + Vite (fast HMR, native ES modules)
-* **Audio:** Native Web Audio API (`AudioContext`, `GainNode`, `BiquadFilterNode`, `ConvolverNode`, `DelayNode`)
-* **Networking:** `socket.io-client` for bidirectional real‑time events, `fetch`/`axios` for REST
-* **Styling:** Vanilla CSS with design tokens (colors, spacing, radii) and glassmorphism effects
-* **Icons:** Lucide React
-
-### Backend
-* **Runtime:** Node.js + Express
-* **Realtime:** `socket.io` (rooms, presence, spin‑wheel engine)
-* **Database:** Mongoose + MongoDB (in‑memory server for dev, ready for Atlas in prod)
-* **File uploads:** `multer` stores WAV files under `/uploads`
-* **Testing:** Jest + Supertest – covers API, WebSocket, and game logic
-
----
-
-## 📦 Project Structure (high‑level)
-
-```
-Project/
-├─ backend/                # Node/Express server
-│   ├─ src/
-│   │   ├─ app.js          # Express app
-│   │   ├─ server.js       # HTTP + Socket.io server
-│   │   ├─ models/         # Mongoose schemas (User, Room, Draft, SpinGame)
-│   │   ├─ services/       # spinEngine.js – authoritative game loop
-│   │   ├─ socket/         # roomSocket.js – socket event handling
-│   │   └─ routes/         # REST endpoints
-│   └─ tests/               # Jest test suite
-├─ frontend/               # React UI
-│   ├─ src/
-│   │   ├─ components/    # AudioStudio, DraftList, LiveRoom, SpinWheel, etc.
-│   │   ├─ audio/         # AudioEngine.js, WavEncoder.js
-│   │   ├─ services/      # api.js (REST) & socket.js (WebSocket wrapper)
-│   │   └─ App.jsx        # Root component with dark‑mode handling
-│   └─ index.css            # Global CSS design system
-├─ docker-compose.yml       # Optional Docker dev environment
-└─ README.md                # This file
-```
-
----
-
-## 📂 Detailed API Reference
-
-### REST Endpoints
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/drafts` | List all saved drafts |
-| `POST` | `/api/drafts` | Upload a new draft (multipart/form‑data) |
-| `DELETE` | `/api/drafts/:id` | Delete a draft |
-| `POST` | `/api/rooms` | Create a private room (returns 6‑char code) |
-| `POST` | `/api/rooms/join` | Join an existing room with a code |
-| `GET` | `/api/rooms` | List discoverable active rooms (no join info) |
-
-### WebSocket Events (`/` namespace)
-| Event | Direction | Payload | Purpose |
-|---|---|---|---|
-| `join_room` | Client → Server | `{roomCode, username}` | Request to join a private room |
-| `room_state` | Server → Client | Full room state (members, draft queue) |
-| `user_joined` / `user_left` | Server → Client | `{username}` | Presence updates |
-| `share_draft` | Client → Server | `{draftId}` | Host shares a draft to the room |
-| `draft_shared` | Server → Client | `{draftUrl, timestamp}` | Synchronized playback trigger |
-| `start_spin` | Host → Server | – | Begin spin‑wheel elimination |
-| `spin_started` | Server → Clients | – | Notify all participants the game began |
-| `user_eliminated` | Server → Clients | `{username}` | Broadcast each elimination |
-| `winner_announced` | Server → Clients | `{username}` | Announce the final winner |
-
----
-
-## 📸 Screenshots (placeholder images)
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x450/0F172A/0284C7?text=Studio+View" alt="Studio View" style="margin: 10px;" />
-  <img src="https://via.placeholder.com/800x450/0F172A/0284C7?text=Lobby+View" alt="Lobby View" style="margin: 10px;" />
-  <img src="https://via.placeholder.com/800x450/0F172A/0284C7?text=Spin+Wheel+Arena" alt="Spin Wheel" style="margin: 10px;" />
-</div>
-
----
-
-## 🚀 Getting Started (Local Development)
+## 🚀 Setup & Run Instructions
 
 ### Prerequisites
 * **Node.js** v16+ (includes npm)
-* **Git** (for version control)
+* **Docker** & **Docker Compose**
+* **Git**
+* **Android Studio** (for building the Android Oboe app)
 
-### 1️⃣ Backend Setup
+### 1️⃣ Backend Local Development
 ```bash
 cd backend
 npm install
-npm start   # runs on http://localhost:5000
+npm start   # Runs on http://localhost:5000
 ```
-> The server uses an **in‑memory MongoDB** instance, so no external DB is required for development.
+> Note: The backend uses an in-memory MongoDB instance for local development by default.
 
-### 2️⃣ Frontend Setup
+### 2️⃣ Frontend Local Development (React/Vite)
 ```bash
 cd frontend
 npm install
-npm run dev   # runs on http://localhost:5173
+npm run dev   # Runs on http://localhost:5173
 ```
-Open the URL in a modern browser (Chrome/Edge/Firefox) and you’ll see the dark‑mode lobby ready for you.
+
+### 3️⃣ Android App
+Open the `/android-app` folder in Android Studio. Build and run on a physical device or emulator. Microphone permissions will be requested on launch.
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Testing
 
 ```bash
 cd backend
-npm test   # Jest + Supertest suite
+npm install
+npm test
 ```
-All tests should pass (`25/25` currently). The suite validates API contracts, WebSocket flows, room lifecycle, and the spin‑wheel elimination algorithm.
+The test suite utilizes Jest + Supertest and covers API contracts, WebSocket flows, room lifecycles, and spin-wheel logic (including eliminations and winner selection).
 
 ---
 
-## 📦 Deployment Guide
+## ☁️ Deployment Instructions
 
-The platform can be deployed as two separate services (backend & frontend) or as a single Docker‑Compose stack.
+The backend is fully containerized and can be deployed to any major cloud provider (AWS/GCP/Azure) using the provided Dockerfile.
 
-### Docker Compose (quick start)
-```yaml
-version: "3.8"
-services:
-  backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-  frontend:
-    build: ./frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
+### Local Docker Build
+```bash
+docker-compose up --build -d
 ```
-Run `docker-compose up --build -d`. The frontend will proxy API calls to the backend container automatically.
+This builds both frontend and backend and proxies requests automatically.
 
-### Vercel / Netlify (frontend only)
-* Push the `frontend/` directory to a Vercel project – the `vite.config.js` is already configured for static export.
-* Set an environment variable `VITE_API_URL` pointing to your deployed backend URL.
-
-### Render / Railway (backend)
-* Create a new **Node.js** service, point it at the `backend/` folder, and expose port `5000`.
-* Add a **MongoDB Atlas** connection string as `MONGODB_URI` (replace the in‑memory DB).
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Follow these steps:
-
-1. **Fork** the repository.
-2. **Clone** your fork locally.
-3. Create a new branch: `git checkout -b feature/your-feature-name`.
-4. Make your changes, ensuring the linting and tests still pass.
-5. Commit with a clear message and push: `git push origin feature/your-feature-name`.
-6. Open a **Pull Request** against the `main` branch.
-
-Please adhere to the **code of conduct** (no harassment, respectful communication) and write **unit tests** for any new functionality.
+### Cloud Deployment (Example: Azure Web App for Containers)
+1. Build the backend image: `docker build -t your-registry/voice-backend ./backend`
+2. Push to your registry: `docker push your-registry/voice-backend`
+3. Configure the container to run on port `5000`.
+4. **Environment Variables**:
+   * `NODE_ENV=production`
+   * `MONGODB_URI=your_production_mongodb_connection_string`
+   * `JWT_SECRET=your_secret_key` (if auth is added later)
+5. **Health Check**: A `/health` endpoint is provided. Configure your cloud provider to ping `http://<your-domain>/health` to verify container health.
 
 ---
 
-## 📜 License
+## 🏛️ System Architecture Diagram
 
-This project is released under the **MIT License** – see the `LICENSE` file for details.
+```mermaid
+graph TD
+    A[Android App / Oboe] -->|REST / Multipart| B(Node.js API)
+    A -->|WebSocket| C(Socket.IO Server)
+    D[Web Client / React] -->|REST| B
+    D -->|WebSocket| C
+    B --> E[(MongoDB)]
+    C --> E
+    C --> F{Spin Engine}
+    F --> C
+```
 
 ---
 
-## 🗺️ Roadmap
+## 🎵 Audio-Flow Diagram
 
-- **Mobile‑first UI** – adapt the studio for iOS/Android browsers.
-- **OAuth Integration** – allow Google/GitHub login for persistent user profiles.
-- **Persisted Drafts** – store drafts in MongoDB instead of local file system.
-- **Live Audio Mixing** – enable multiple participants to mix tracks together in real time.
-- **Leaderboard & Achievements** – gamify the spin‑wheel with persistent rankings.
+```mermaid
+sequenceDiagram
+    participant Mic as Microphone
+    participant Oboe as Oboe (Native C++)
+    participant Effect as DSP (Echo/Reverb)
+    participant FS as Local Storage
+    participant API as Node.js Backend
+
+    Mic->>Oboe: Capture Audio Stream
+    Oboe->>Effect: Process Stream (Real-time)
+    Effect->>FS: Save as Draft (.wav)
+    FS->>API: Upload Draft (Multipart/form-data)
+    API-->>FS: Return Hosted URL
+```
 
 ---
 
-<div align="center">
-  <p>Built with ❤️ for vocal artists, producers, and developers who love real‑time collaboration.</p>
-</div>
+## 🤝 Room and WebSocket Event-Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant UserA as User A (Host)
+    participant Server as Node.js Socket.IO
+    participant UserB as User B
+
+    UserA->>Server: join_room {roomCode, username}
+    Server-->>UserA: room_state (Members, Drafts)
+    UserB->>Server: join_room {roomCode, username}
+    Server-->>UserA: user_joined {username}
+    Server-->>UserB: room_state
+    
+    UserA->>Server: share_draft {draftId}
+    Server-->>UserA: draft_shared {draftUrl, timestamp}
+    Server-->>UserB: draft_shared {draftUrl, timestamp}
+```
+
+---
+
+## 🎡 Spin State-Machine / Sequence Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> WAITING: Room Created
+    WAITING --> RUNNING: Admin Starts Spin (Min 3 Users)
+    RUNNING --> RUNNING: Eliminate Participant (Every 5s)
+    RUNNING --> COMPLETED: 1 User Remaining (Winner)
+    RUNNING --> ABORTED: Insufficient Players / Admin Leaves
+    COMPLETED --> WAITING: Reset
+    ABORTED --> WAITING: Reset
+```
+
+---
+
+## ⚠️ Assumptions, Edge Cases, Trade-offs & Limitations
+
+### Assumptions
+* **Virtual Points:** Spin wheel rewards use virtual points stored in MongoDB. No actual financial or wallet transactions are modeled.
+* **Audio Transcoding:** The Android app uploads standard WAV files. We assume standard network conditions where WAV file sizes are acceptable without heavy compression (like MP3/AAC), simplifying the native layer.
+
+### Handled Edge Cases
+* **Insufficient Players:** If a spin is initiated with fewer than 3 users, the server rejects the `start_spin` request.
+* **User Disconnects During Spin:** If a user drops connection while `RUNNING`, they are removed from the eligible pool immediately. The elimination timer continues normally.
+* **Admin Disconnects:** If the room owner leaves during a spin, the spin transitions to `ABORTED` to prevent orphaned game loops.
+
+### Trade-offs
+* **WebSocket over WebRTC:** We chose WebSocket (Socket.IO) for room state and event broadcasting. Since live audio streaming is out of scope (we are sharing recorded drafts), WebRTC is unnecessary overhead.
+* **In-Memory DB vs. Managed DB:** For local development velocity, an in-memory MongoDB is used. The trade-off is data loss on restart, but the schema seamlessly scales to a managed MongoDB Atlas instance in production via the `MONGODB_URI` environment variable.
+
+### Known Limitations
+* **Audio Sync:** The `draft_shared` event triggers simultaneous playback, but absolute millisecond-perfect sync across global clients may vary due to differing network latencies.
+* **Single Spin at a Time:** The architecture enforces a strict one-active-spin rule per room.
