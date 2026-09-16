@@ -1,8 +1,6 @@
-# 🎙️ RoxStar: Unified Audio Platform
+# 🎙️ Unified Audio Platform
 
-<div align="center">
-  <img src="https://via.placeholder.com/1200x400/0F172A/0284C7?text=RoxStar+Audio+Platform" alt="RoxStar Banner" width="100%" />
-</div>
+
 
 > **A real‑time, unified audio platform for vocal artists to record, mix, and collaborate on voice drafts in private social rooms, featuring a multiplayer spin‑wheel arena!**
 
@@ -15,14 +13,14 @@
 
 ## 📖 About The Project
 
-RoxStar was born from the frustration of juggling separate tools for **recording**, **editing**, **sharing**, and **collaborating** on vocal takes. Instead of exporting a WAV file, uploading it to a cloud drive, and then waiting for a teammate to download it, developers wanted a **single, web‑based environment** where:
+The platform was born from the frustration of juggling separate tools for **recording**, **editing**, **sharing**, and **collaborating** on vocal takes. Instead of exporting a WAV file, uploading it to a cloud drive, and then waiting for a teammate to download it, developers wanted a **single, web‑based environment** where:
 
 *   Artists could **record** directly from the browser using the Web Audio API.
 *   Producers could **apply DSP effects** in real time.
 *   Teams could **share drafts instantly** inside a live, **private** audio room.
 *   Collaboration could be **fun** – hence the multiplayer spin‑wheel game that keeps the vibe lively.
 
-RoxStar delivers all of that and more, fully in the browser, with a sleek dark‑mode UI.
+The platform delivers all of that and more, fully in the browser, with a sleek dark‑mode UI.
 
 ---
 
@@ -66,7 +64,7 @@ RoxStar delivers all of that and more, fully in the browser, with a sleek dark�
 ## 📦 Project Structure (high‑level)
 
 ```
-RoxStar/
+Project/
 ├─ backend/                # Node/Express server
 │   ├─ src/
 │   │   ├─ app.js          # Express app
@@ -162,7 +160,7 @@ All tests should pass (`25/25` currently). The suite validates API contracts, We
 
 ## 📦 Deployment Guide
 
-RoxStar can be deployed as two separate services (backend & frontend) or as a single Docker‑Compose stack.
+The platform can be deployed as two separate services (backend & frontend) or as a single Docker‑Compose stack.
 
 ### Docker Compose (quick start)
 ```yaml
